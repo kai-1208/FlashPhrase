@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "word_en": "refer",
+    "word_ja": "参照する、言及する、(人を)紹介する",
+    "sentence_en": "Please refer to the map",
+    "sentence_ja": "地図を参照してください",
+    "memo": "「言及する」の意味で設問文に入っているほか、「(人を)紹介する」の意味でも出る。例Refer a friend and get paid. (友人を紹介すれば現金還元)関referral (紹介)例customer-referral program (顧客紹介プログラム)",
+    "dummy1": "延期する",
+    "dummy2": "反映する",
+    "dummy3": "好む"
+  }
+]
