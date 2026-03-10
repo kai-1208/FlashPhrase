@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import type { Word } from '../types';
-import { addReviewId } from '../lib/storage';
+import { addReviewId, addLearnedId } from '../lib/storage';
 
 interface WordModeScreenProps {
   words: Word[];
@@ -23,6 +23,7 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({ words, onFinish,
       addReviewId(reviewType, currentWord.id);
       setIncorrectCount(prev => prev + 1);
     } else {
+      addLearnedId(reviewType, currentWord.id);
       setCorrectCount(prev => prev + 1);
     }
 

@@ -15,6 +15,8 @@ interface HomeScreenProps {
   reviewWordCount: number;
   reviewPhraseCount: number;
   reviewTestCount: number;
+  learnedWordCount: number;
+  learnedPhraseCount: number;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -26,6 +28,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onStartMode,
   reviewWordCount,
   reviewPhraseCount,
+  learnedWordCount,
+  learnedPhraseCount,
 }) => {
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto pb-8">
@@ -71,26 +75,40 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* Modes */}
         <div className="space-y-4">
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">単語モード</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Button
               variant="primary"
-              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-primary-500/20 shadow-lg"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-primary-500/20 shadow-lg px-2"
               onClick={() => onStartMode('word_all')}
             >
               <BookOpen className="w-6 h-6 mb-1" />
-              <div className="text-sm font-bold">すべて</div>
+              <div className="text-xs font-bold leading-tight">すべて</div>
             </Button>
             <Button
               variant="secondary"
-              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
               onClick={() => onStartMode('word_review')}
               disabled={reviewWordCount === 0}
             >
               <BookCheck className={cn("w-6 h-6 mb-1", reviewWordCount > 0 ? "text-amber-500" : "text-slate-300")} />
-              <div className="text-sm font-bold">復習のみ</div>
+              <div className="text-xs font-bold leading-tight">復習のみ</div>
               {reviewWordCount > 0 && (
-                <span className="absolute top-3 right-3 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
                   {reviewWordCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('word_learned')}
+              disabled={learnedWordCount === 0}
+            >
+              <BookCheck className={cn("w-6 h-6 mb-1", learnedWordCount > 0 ? "text-success-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">学習済み</div>
+              {learnedWordCount > 0 && (
+                <span className="absolute top-2 right-2 bg-success-100 text-success-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {learnedWordCount}
                 </span>
               )}
             </Button>
@@ -99,26 +117,40 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
         <div className="space-y-4">
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">フレーズモード</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Button
               variant="primary"
-              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-primary-500/20 shadow-lg"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-primary-500/20 shadow-lg px-2"
               onClick={() => onStartMode('phrase_all')}
             >
               <MessageCircle className="w-6 h-6 mb-1" />
-              <div className="text-sm font-bold">すべて</div>
+              <div className="text-xs font-bold leading-tight">すべて</div>
             </Button>
             <Button
               variant="secondary"
-              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
               onClick={() => onStartMode('phrase_review')}
               disabled={reviewPhraseCount === 0}
             >
               <MessageSquareCheck className={cn("w-6 h-6 mb-1", reviewPhraseCount > 0 ? "text-amber-500" : "text-slate-300")} />
-              <div className="text-sm font-bold">復習のみ</div>
+              <div className="text-xs font-bold leading-tight">復習のみ</div>
               {reviewPhraseCount > 0 && (
-                <span className="absolute top-3 right-3 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
                   {reviewPhraseCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('phrase_learned')}
+              disabled={learnedPhraseCount === 0}
+            >
+              <MessageSquareCheck className={cn("w-6 h-6 mb-1", learnedPhraseCount > 0 ? "text-success-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">学習済み</div>
+              {learnedPhraseCount > 0 && (
+                <span className="absolute top-2 right-2 bg-success-100 text-success-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {learnedPhraseCount}
                 </span>
               )}
             </Button>
@@ -127,14 +159,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
         <div className="space-y-4">
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">確認テスト (4択)</h2>
-          <Button
-            variant="success"
-            className="w-full h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg"
-            onClick={() => onStartMode('test')}
-          >
-            <BrainCircuit className="w-7 h-7 mb-1" />
-            <div className="text-base font-bold">テストを開始する</div>
-          </Button>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="success"
+              className="w-full h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg"
+              onClick={() => onStartMode('test_word')}
+            >
+              <BrainCircuit className="w-7 h-7 mb-1" />
+              <div className="text-sm font-bold">単語テスト</div>
+            </Button>
+            <Button
+              variant="success"
+              className="w-full h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
+              onClick={() => onStartMode('test_phrase')}
+            >
+              <MessageCircle className="w-7 h-7 mb-1" />
+              <div className="text-sm font-bold">フレーズテスト</div>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

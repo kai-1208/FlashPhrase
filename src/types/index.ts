@@ -5,6 +5,7 @@ export interface Word {
   sentence_en: string;
   sentence_ja: string;
   memo: string;
+  answer_ja: string;
   dummy1: string;
   dummy2: string;
   dummy3: string;
@@ -13,9 +14,12 @@ export interface Word {
 export type LearningMode = 
   | 'word_all'
   | 'word_review'
+  | 'word_learned'
   | 'phrase_all'
   | 'phrase_review'
-  | 'test'
+  | 'phrase_learned'
+  | 'test_word'
+  | 'test_phrase'
   | 'none';
 
 export interface AppState {

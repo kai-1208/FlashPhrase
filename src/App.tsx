@@ -6,7 +6,7 @@ import { TestModeScreen } from './screens/TestModeScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import wordsData from './data/words.json';
 import type { Word, LearningMode, AppState } from './types';
-import { getReviewList } from './lib/storage';
+import { getReviewList, getLearnedList } from './lib/storage';
 
 const App: React.FC = () => {
   const allWords = wordsData as Word[];
@@ -25,6 +25,8 @@ const App: React.FC = () => {
   const [reviewWordCount, setReviewWordCount] = useState(0);
   const [reviewPhraseCount, setReviewPhraseCount] = useState(0);
   const [reviewTestCount, setReviewTestCount] = useState(0);
+  const [learnedWordCount, setLearnedWordCount] = useState(0);
+  const [learnedPhraseCount, setLearnedPhraseCount] = useState(0);
 
   const updateReviewCounts = () => {
     // Only count reviews within the current range
@@ -32,6 +34,10 @@ const App: React.FC = () => {
     setReviewWordCount(getReviewList('word').filter(inRange).length);
     setReviewPhraseCount(getReviewList('phrase').filter(inRange).length);
     setReviewTestCount(getReviewList('test').filter(inRange).length);
+    
+    // Using simple import logic for getLearnedList, let's make sure it's imported at the top
+    setLearnedWordCount(getLearnedList('word').filter(inRange).length);
+    setLearnedPhraseCount(getLearnedList('phrase').filter(inRange).length);
   };
 
   useEffect(() => {
@@ -48,10 +54,10 @@ const App: React.FC = () => {
 
     let sessionWords: Word[] = [];
 
-    if (mode === 'word_all' || mode === 'phrase_all' || mode === 'test') {
+    if (mode === 'word_all' || mode === 'phrase_all' || mode === 'test_word' || mode === 'test_phrase') {
       sessionWords = [...wordsInRange];
       // Randomize for test mode
-      if (mode === 'test') {
+      if (mode === 'test_word' || mode === 'test_phrase') {
         sessionWords.sort(() => Math.random() - 0.5);
       }
     } else if (mode === 'word_review') {
@@ -60,6 +66,12 @@ const App: React.FC = () => {
     } else if (mode === 'phrase_review') {
       const reviewIds = getReviewList('phrase');
       sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
+    } else if (mode === 'word_learned') {
+      const learnedIds = getLearnedList('word');
+      sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
+    } else if (mode === 'phrase_learned') {
+      const learnedIds = getLearnedList('phrase');
+      sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
     }
 
     if (sessionWords.length === 0) {
@@ -110,10 +122,12 @@ const App: React.FC = () => {
           reviewWordCount={reviewWordCount}
           reviewPhraseCount={reviewPhraseCount}
           reviewTestCount={reviewTestCount}
+          learnedWordCount={learnedWordCount}
+          learnedPhraseCount={learnedPhraseCount}
         />
       )}
       
-      {(state.mode === 'word_all' || state.mode === 'word_review') && (
+      {(state.mode === 'word_all' || state.mode === 'word_review' || state.mode === 'word_learned') && (
         <WordModeScreen 
           words={state.sessionWords}
           onFinish={handleFinish}
@@ -121,7 +135,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {(state.mode === 'phrase_all' || state.mode === 'phrase_review') && (
+      {(state.mode === 'phrase_all' || state.mode === 'phrase_review' || state.mode === 'phrase_learned') && (
         <WordModeScreen 
           words={state.sessionWords}
           onFinish={handleFinish}
@@ -129,10 +143,11 @@ const App: React.FC = () => {
         />
       )}
 
-      {state.mode === 'test' && (
+      {(state.mode === 'test_word' || state.mode === 'test_phrase') && (
         <TestModeScreen 
           words={state.sessionWords}
           onFinish={handleFinish}
+          testType={state.mode === 'test_word' ? 'word' : 'phrase'}
         />
       )}
 
