@@ -14,9 +14,12 @@ interface HomeScreenProps {
   onStartMode: (mode: LearningMode) => void;
   reviewWordCount: number;
   reviewPhraseCount: number;
-  reviewTestCount: number;
+  reviewTestWordCount: number;
+  reviewTestPhraseCount: number;
   learnedWordCount: number;
   learnedPhraseCount: number;
+  learnedTestWordCount: number;
+  learnedTestPhraseCount: number;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -28,8 +31,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onStartMode,
   reviewWordCount,
   reviewPhraseCount,
+  reviewTestWordCount,
+  reviewTestPhraseCount,
   learnedWordCount,
   learnedPhraseCount,
+  learnedTestWordCount,
+  learnedTestPhraseCount,
 }) => {
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto pb-8">
@@ -158,23 +165,85 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">確認テスト (4択)</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">単語テスト (4択)</h2>
+          <div className="grid grid-cols-3 gap-3">
             <Button
               variant="success"
-              className="w-full h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg px-2"
               onClick={() => onStartMode('test_word')}
             >
-              <BrainCircuit className="w-7 h-7 mb-1" />
-              <div className="text-sm font-bold">単語テスト</div>
+              <BrainCircuit className="w-6 h-6 mb-1" />
+              <div className="text-xs font-bold leading-tight">すべて</div>
             </Button>
             <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('test_word_review')}
+              disabled={reviewTestWordCount === 0}
+            >
+              <BookCheck className={cn("w-6 h-6 mb-1", reviewTestWordCount > 0 ? "text-amber-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">復習のみ</div>
+              {reviewTestWordCount > 0 && (
+                <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {reviewTestWordCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('test_word_learned')}
+              disabled={learnedTestWordCount === 0}
+            >
+              <BookCheck className={cn("w-6 h-6 mb-1", learnedTestWordCount > 0 ? "text-success-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">学習済み</div>
+              {learnedTestWordCount > 0 && (
+                <span className="absolute top-2 right-2 bg-success-100 text-success-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {learnedTestWordCount}
+                </span>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider px-2">フレーズテスト (4択)</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <Button
               variant="success"
-              className="w-full h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl shadow-success-500/20 shadow-lg px-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800"
               onClick={() => onStartMode('test_phrase')}
             >
-              <MessageCircle className="w-7 h-7 mb-1" />
-              <div className="text-sm font-bold">フレーズテスト</div>
+              <MessageCircle className="w-6 h-6 mb-1" />
+              <div className="text-xs font-bold leading-tight">すべて</div>
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('test_phrase_review')}
+              disabled={reviewTestPhraseCount === 0}
+            >
+              <MessageSquareCheck className={cn("w-6 h-6 mb-1", reviewTestPhraseCount > 0 ? "text-amber-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">復習のみ</div>
+              {reviewTestPhraseCount > 0 && (
+                <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {reviewTestPhraseCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-auto py-5 flex-col gap-2 rounded-2xl bg-white border border-slate-200 text-slate-700 shadow-sm px-2 relative"
+              onClick={() => onStartMode('test_phrase_learned')}
+              disabled={learnedTestPhraseCount === 0}
+            >
+              <MessageSquareCheck className={cn("w-6 h-6 mb-1", learnedTestPhraseCount > 0 ? "text-success-500" : "text-slate-300")} />
+              <div className="text-xs font-bold leading-tight">学習済み</div>
+              {learnedTestPhraseCount > 0 && (
+                <span className="absolute top-2 right-2 bg-success-100 text-success-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {learnedTestPhraseCount}
+                </span>
+              )}
             </Button>
           </div>
         </div>

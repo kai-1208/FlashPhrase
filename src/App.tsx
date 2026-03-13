@@ -24,20 +24,26 @@ const App: React.FC = () => {
 
   const [reviewWordCount, setReviewWordCount] = useState(0);
   const [reviewPhraseCount, setReviewPhraseCount] = useState(0);
-  const [reviewTestCount, setReviewTestCount] = useState(0);
+  const [reviewTestWordCount, setReviewTestWordCount] = useState(0);
+  const [reviewTestPhraseCount, setReviewTestPhraseCount] = useState(0);
   const [learnedWordCount, setLearnedWordCount] = useState(0);
   const [learnedPhraseCount, setLearnedPhraseCount] = useState(0);
+  const [learnedTestWordCount, setLearnedTestWordCount] = useState(0);
+  const [learnedTestPhraseCount, setLearnedTestPhraseCount] = useState(0);
 
   const updateReviewCounts = () => {
     // Only count reviews within the current range
     const inRange = (id: number) => id >= state.rangeStart && id <= state.rangeEnd;
     setReviewWordCount(getReviewList('word').filter(inRange).length);
     setReviewPhraseCount(getReviewList('phrase').filter(inRange).length);
-    setReviewTestCount(getReviewList('test').filter(inRange).length);
-    
+    setReviewTestWordCount(getReviewList('test_word').filter(inRange).length);
+    setReviewTestPhraseCount(getReviewList('test_phrase').filter(inRange).length);
+
     // Using simple import logic for getLearnedList, let's make sure it's imported at the top
     setLearnedWordCount(getLearnedList('word').filter(inRange).length);
     setLearnedPhraseCount(getLearnedList('phrase').filter(inRange).length);
+    setLearnedTestWordCount(getLearnedList('test_word').filter(inRange).length);
+    setLearnedTestPhraseCount(getLearnedList('test_phrase').filter(inRange).length);
   };
 
   useEffect(() => {
@@ -66,12 +72,28 @@ const App: React.FC = () => {
     } else if (mode === 'phrase_review') {
       const reviewIds = getReviewList('phrase');
       sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
+    } else if (mode === 'test_word_review') {
+      const reviewIds = getReviewList('test_word');
+      sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
+      sessionWords.sort(() => Math.random() - 0.5);
+    } else if (mode === 'test_phrase_review') {
+      const reviewIds = getReviewList('test_phrase');
+      sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
+      sessionWords.sort(() => Math.random() - 0.5);
     } else if (mode === 'word_learned') {
       const learnedIds = getLearnedList('word');
       sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
     } else if (mode === 'phrase_learned') {
       const learnedIds = getLearnedList('phrase');
       sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
+    } else if (mode === 'test_word_learned') {
+      const learnedIds = getLearnedList('test_word');
+      sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
+      sessionWords.sort(() => Math.random() - 0.5);
+    } else if (mode === 'test_phrase_learned') {
+      const learnedIds = getLearnedList('test_phrase');
+      sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
+      sessionWords.sort(() => Math.random() - 0.5);
     }
 
     if (sessionWords.length === 0) {
@@ -121,14 +143,17 @@ const App: React.FC = () => {
           onStartMode={handleStartMode}
           reviewWordCount={reviewWordCount}
           reviewPhraseCount={reviewPhraseCount}
-          reviewTestCount={reviewTestCount}
+          reviewTestWordCount={reviewTestWordCount}
+          reviewTestPhraseCount={reviewTestPhraseCount}
           learnedWordCount={learnedWordCount}
           learnedPhraseCount={learnedPhraseCount}
+          learnedTestWordCount={learnedTestWordCount}
+          learnedTestPhraseCount={learnedTestPhraseCount}
         />
       )}
-      
+
       {(state.mode === 'word_all' || state.mode === 'word_review' || state.mode === 'word_learned') && (
-        <WordModeScreen 
+        <WordModeScreen
           words={state.sessionWords}
           onFinish={handleFinish}
           reviewType="word"
@@ -136,23 +161,23 @@ const App: React.FC = () => {
       )}
 
       {(state.mode === 'phrase_all' || state.mode === 'phrase_review' || state.mode === 'phrase_learned') && (
-        <WordModeScreen 
+        <WordModeScreen
           words={state.sessionWords}
           onFinish={handleFinish}
           reviewType="phrase"
         />
       )}
 
-      {(state.mode === 'test_word' || state.mode === 'test_phrase') && (
-        <TestModeScreen 
+      {(state.mode === 'test_word' || state.mode === 'test_phrase' || state.mode === 'test_word_review' || state.mode === 'test_phrase_review' || state.mode === 'test_word_learned' || state.mode === 'test_phrase_learned') && (
+        <TestModeScreen
           words={state.sessionWords}
           onFinish={handleFinish}
-          testType={state.mode === 'test_word' ? 'word' : 'phrase'}
+          testType={state.mode.includes('word') ? 'word' : 'phrase'}
         />
       )}
 
       {state.mode === ('result' as any) && (
-        <ResultScreen 
+        <ResultScreen
           total={state.sessionWords.length}
           correct={state.correctCount}
           incorrect={state.incorrectCount}

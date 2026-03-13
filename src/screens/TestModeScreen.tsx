@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import type { Word } from '../types';
-import { addReviewId } from '../lib/storage';
+import { addReviewId, addLearnedId } from '../lib/storage';
 
 interface TestModeScreenProps {
   words: Word[];
@@ -14,7 +14,7 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [incorrectCount, setIncorrectCount] = useState(0);
-  
+
   // local state for choices to avoid re-shuffling on re-render
   const [choices, setChoices] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -48,13 +48,15 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
     if (selectedAnswer) return; // Prevent double taps
 
     setSelectedAnswer(answer);
-    
+
     const isCorrect = answer === currentWord.answer_ja;
+    const storageType = testType === 'word' ? 'test_word' : 'test_phrase';
     if (isCorrect) {
       setCorrectCount(prev => prev + 1);
+      addLearnedId(storageType, currentWord.id);
     } else {
       setIncorrectCount(prev => prev + 1);
-      addReviewId('test', currentWord.id);
+      addReviewId(storageType, currentWord.id);
     }
 
     // Show explanation instead of auto-advancing
@@ -99,8 +101,8 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
           <span className="uppercase tracking-widest text-primary-500">Test Mode</span>
         </div>
         <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-primary-500 transition-all duration-300" 
+          <div
+            className="h-full bg-primary-500 transition-all duration-300"
             style={{ width: `${((currentIndex + 1) / words.length) * 100}%` }}
           />
         </div>
@@ -109,11 +111,10 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
       {/* Question Card */}
       <Card className="shrink-0 mb-6 shadow-md border-none min-h-[160px] flex items-center justify-center">
         <CardContent className="text-center p-8">
-          <h2 className={`tracking-tight text-slate-800 break-words leading-tight ${
-            testType === 'word' ? 'text-4xl font-extrabold' : 'text-2xl font-bold'
-          }`}>
-            {testType === 'word' 
-              ? currentWord.word_en 
+          <h2 className={`tracking-tight text-slate-800 break-words leading-tight ${testType === 'word' ? 'text-4xl font-extrabold' : 'text-2xl font-bold'
+            }`}>
+            {testType === 'word'
+              ? currentWord.word_en
               : renderHighlightedSentence(currentWord.sentence_en, currentWord.word_en)}
           </h2>
         </CardContent>
@@ -124,7 +125,7 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
         {choices.map((choice, i) => {
           const isSelected = selectedAnswer === choice;
           const isCorrectAnswer = choice === currentWord.answer_ja;
-          
+
           let btnVariant: 'outline' | 'success' | 'danger' = 'outline';
           if (selectedAnswer) {
             if (isCorrectAnswer) btnVariant = 'success';
@@ -135,9 +136,8 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
             <Button
               key={i}
               variant={btnVariant}
-              className={`h-16 text-lg rounded-2xl border-2 transition-all ${
-                selectedAnswer ? 'pointer-events-none' : 'hover:scale-[1.01] active:scale-[0.98]'
-              }`}
+              className={`h-16 text-lg rounded-2xl border-2 transition-all ${selectedAnswer ? 'pointer-events-none' : 'hover:scale-[1.01] active:scale-[0.98]'
+                }`}
               onClick={() => handleAnswer(choice)}
             >
               {choice}
@@ -151,20 +151,19 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
         <div className="absolute inset-x-0 bottom-0 bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.12)] rounded-t-3xl pt-8 pb-8 px-6 flex flex-col items-center animate-in slide-in-from-bottom-full duration-300 z-20">
           {/* Result Badge */}
           <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-            <div className={`px-6 py-1.5 rounded-full font-bold text-lg shadow-lg border-4 border-white whitespace-nowrap ${
-              selectedAnswer === currentWord.answer_ja ? 'bg-success-500 text-white' : 'bg-danger-500 text-white'
-            }`}>
+            <div className={`px-6 py-1.5 rounded-full font-bold text-lg shadow-lg border-4 border-white whitespace-nowrap ${selectedAnswer === currentWord.answer_ja ? 'bg-success-500 text-white' : 'bg-danger-500 text-white'
+              }`}>
               {selectedAnswer === currentWord.answer_ja ? '正解！' : '不正解...'}
             </div>
           </div>
 
           <div className="w-12 h-1.5 bg-slate-200 rounded-full mb-4" />
-          
+
           <div className="w-full text-center space-y-4 mb-6">
             <h3 className="text-xl font-bold text-slate-800">
               {testType === 'word' ? currentWord.word_ja : currentWord.sentence_ja}
             </h3>
-            
+
             {testType === 'word' && currentWord.sentence_en && currentWord.sentence_ja && (
               <div className="bg-slate-50 rounded-xl py-3 px-4 border border-slate-100 text-left">
                 <p className="font-semibold text-slate-700 text-[0.95rem] leading-snug">{currentWord.sentence_en}</p>
@@ -178,7 +177,7 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
                 <p className="text-slate-500 text-sm mt-1.5 leading-snug">{currentWord.word_ja}</p>
               </div>
             )}
-            
+
             {currentWord.memo && (
               <p className="text-slate-500 text-sm leading-relaxed text-left bg-primary-50 px-4 py-3 rounded-xl">
                 {currentWord.memo}
@@ -186,8 +185,8 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
             )}
           </div>
 
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             className="w-full h-14 text-lg font-bold rounded-2xl shadow-primary-500/20 shadow-lg"
             onClick={handleNext}
           >

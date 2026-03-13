@@ -11,7 +11,7 @@ export interface Word {
   dummy3: string;
 }
 
-export type LearningMode = 
+export type LearningMode =
   | 'word_all'
   | 'word_review'
   | 'word_learned'
@@ -19,7 +19,11 @@ export type LearningMode =
   | 'phrase_review'
   | 'phrase_learned'
   | 'test_word'
+  | 'test_word_review'
+  | 'test_word_learned'
   | 'test_phrase'
+  | 'test_phrase_review'
+  | 'test_phrase_learned'
   | 'none';
 
 export interface AppState {
