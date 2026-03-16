@@ -6,16 +6,17 @@ import { TestModeScreen } from './screens/TestModeScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import wordsData from './data/words.json';
 import type { Word, LearningMode, AppState } from './types';
-import { getReviewList, getLearnedList } from './lib/storage';
+import { getReviewList, getLearnedList, getActiveSession, saveActiveSession, clearActiveSession } from './lib/storage';
 
 const App: React.FC = () => {
   const allWords = wordsData as Word[];
   const maxWords = allWords.length;
+  const [hasActiveSession, setHasActiveSession] = useState(false);
 
   const [state, setState] = useState<AppState>({
     mode: 'none',
     rangeStart: 1,
-    rangeEnd: Math.min(100, maxWords),
+    rangeEnd: Math.min(400, maxWords),
     currentIndex: 0,
     correctCount: 0,
     incorrectCount: 0,
@@ -49,8 +50,16 @@ const App: React.FC = () => {
   useEffect(() => {
     if (state.mode === 'none') {
       updateReviewCounts();
+      setHasActiveSession(!!getActiveSession());
     }
   }, [state.mode, state.rangeStart, state.rangeEnd]);
+
+  const handleResumeSession = () => {
+    const session = getActiveSession();
+    if (session) {
+      setState(session);
+    }
+  };
 
   const handleStartMode = (mode: LearningMode) => {
     // Get words in range
@@ -101,17 +110,33 @@ const App: React.FC = () => {
       return;
     }
 
-    setState({
+    const newState = {
       ...state,
       mode,
       currentIndex: 0,
       correctCount: 0,
       incorrectCount: 0,
       sessionWords,
-    });
+    };
+    setState(newState);
+    saveActiveSession(newState);
+  };
+
+  const handleProgress = (currentIndex: number, correctCount: number, incorrectCount: number) => {
+    const updatedState = { ...state, currentIndex, correctCount, incorrectCount };
+    setState(updatedState);
+    saveActiveSession(updatedState);
+  };
+
+  const handleQuit = () => {
+    setState((prev) => ({
+      ...prev,
+      mode: 'none',
+    }));
   };
 
   const handleFinish = (correctCount: number, incorrectCount: number) => {
+    clearActiveSession();
     setState((prev) => ({
       ...prev,
       mode: 'result' as any,
@@ -124,10 +149,6 @@ const App: React.FC = () => {
     setState((prev) => ({
       ...prev,
       mode: 'none',
-      currentIndex: 0,
-      correctCount: 0,
-      incorrectCount: 0,
-      sessionWords: [],
     }));
   };
 
@@ -149,12 +170,19 @@ const App: React.FC = () => {
           learnedPhraseCount={learnedPhraseCount}
           learnedTestWordCount={learnedTestWordCount}
           learnedTestPhraseCount={learnedTestPhraseCount}
+          hasActiveSession={hasActiveSession}
+          onResumeSession={handleResumeSession}
         />
       )}
 
       {(state.mode === 'word_all' || state.mode === 'word_review' || state.mode === 'word_learned') && (
         <WordModeScreen
           words={state.sessionWords}
+          initialIndex={state.currentIndex}
+          initialCorrect={state.correctCount}
+          initialIncorrect={state.incorrectCount}
+          onProgress={handleProgress}
+          onQuit={handleQuit}
           onFinish={handleFinish}
           reviewType="word"
         />
@@ -163,6 +191,11 @@ const App: React.FC = () => {
       {(state.mode === 'phrase_all' || state.mode === 'phrase_review' || state.mode === 'phrase_learned') && (
         <WordModeScreen
           words={state.sessionWords}
+          initialIndex={state.currentIndex}
+          initialCorrect={state.correctCount}
+          initialIncorrect={state.incorrectCount}
+          onProgress={handleProgress}
+          onQuit={handleQuit}
           onFinish={handleFinish}
           reviewType="phrase"
         />
@@ -171,6 +204,11 @@ const App: React.FC = () => {
       {(state.mode === 'test_word' || state.mode === 'test_phrase' || state.mode === 'test_word_review' || state.mode === 'test_phrase_review' || state.mode === 'test_word_learned' || state.mode === 'test_phrase_learned') && (
         <TestModeScreen
           words={state.sessionWords}
+          initialIndex={state.currentIndex}
+          initialCorrect={state.correctCount}
+          initialIncorrect={state.incorrectCount}
+          onProgress={handleProgress}
+          onQuit={handleQuit}
           onFinish={handleFinish}
           testType={state.mode.includes('word') ? 'word' : 'phrase'}
         />

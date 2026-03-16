@@ -7,31 +7,51 @@ import { addReviewId, addLearnedId } from '../lib/storage';
 interface WordModeScreenProps {
   words: Word[];
   onFinish: (correctCount: number, incorrectCount: number) => void;
+  initialIndex: number;
+  initialCorrect: number;
+  initialIncorrect: number;
+  onProgress: (currentIndex: number, correctCount: number, incorrectCount: number) => void;
+  onQuit: () => void;
   reviewType: 'word' | 'phrase';
 }
 
-export const WordModeScreen: React.FC<WordModeScreenProps> = ({ words, onFinish, reviewType }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+import { X } from 'lucide-react';
+
+export const WordModeScreen: React.FC<WordModeScreenProps> = ({ 
+  words, 
+  onFinish, 
+  reviewType,
+  initialIndex,
+  initialCorrect,
+  initialIncorrect,
+  onProgress,
+  onQuit
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [correctCount, setCorrectCount] = useState(initialCorrect);
+  const [incorrectCount, setIncorrectCount] = useState(initialIncorrect);
 
   const currentWord = words[currentIndex];
 
   const handleNext = (knew: boolean) => {
+    const newCorrect = correctCount + (knew ? 1 : 0);
+    const newIncorrect = incorrectCount + (!knew ? 1 : 0);
+
     if (!knew) {
       addReviewId(reviewType, currentWord.id);
-      setIncorrectCount(prev => prev + 1);
+      setIncorrectCount(newIncorrect);
     } else {
       addLearnedId(reviewType, currentWord.id);
-      setCorrectCount(prev => prev + 1);
+      setCorrectCount(newCorrect);
     }
 
     if (currentIndex + 1 < words.length) {
       setCurrentIndex(prev => prev + 1);
       setIsRevealed(false);
+      onProgress(currentIndex + 1, newCorrect, newIncorrect);
     } else {
-      onFinish(correctCount + (knew ? 1 : 0), incorrectCount + (!knew ? 1 : 0));
+      onFinish(newCorrect, newIncorrect);
     }
   };
 
@@ -40,6 +60,9 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({ words, onFinish,
       {/* Progress */}
       <div className="absolute top-4 left-0 right-0 px-6">
         <div className="flex items-center justify-between text-sm font-bold text-slate-400 mb-2">
+          <button onClick={onQuit} className="p-1 -ml-2 text-slate-400 hover:text-slate-600 active:scale-90 transition-all rounded-full hover:bg-slate-200">
+            <X size={20} />
+          </button>
           <span>{currentIndex + 1} / {words.length}</span>
           <span className="uppercase tracking-widest">{reviewType === 'word' ? 'Word Mode' : 'Phrase Mode'}</span>
         </div>

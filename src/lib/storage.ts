@@ -7,6 +7,9 @@ const STORAGE_KEY_WORD_LEARNED = 'flashphrase_word_learned';
 const STORAGE_KEY_PHRASE_LEARNED = 'flashphrase_phrase_learned';
 const STORAGE_KEY_TEST_WORD_LEARNED = 'flashphrase_test_word_learned';
 const STORAGE_KEY_TEST_PHRASE_LEARNED = 'flashphrase_test_phrase_learned';
+const STORAGE_KEY_ACTIVE_SESSION = 'flashphrase_active_session';
+
+import type { AppState } from '../types';
 
 export type StorageType = 'word' | 'phrase' | 'test_word' | 'test_phrase';
 
@@ -94,4 +97,26 @@ export const removeLearnedId = (type: StorageType, id: number): void => {
   } catch (error) {
     console.error('Failed to save to localStorage', error);
   }
+};
+
+export const saveActiveSession = (session: AppState): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVE_SESSION, JSON.stringify(session));
+  } catch (error) {
+    console.error('Failed to save to localStorage', error);
+  }
+};
+
+export const getActiveSession = (): AppState | null => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY_ACTIVE_SESSION);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('Failed to parse from localStorage', error);
+    return null;
+  }
+};
+
+export const clearActiveSession = (): void => {
+  localStorage.removeItem(STORAGE_KEY_ACTIVE_SESSION);
 };

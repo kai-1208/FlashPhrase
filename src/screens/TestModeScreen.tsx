@@ -7,13 +7,29 @@ import { addReviewId, addLearnedId } from '../lib/storage';
 interface TestModeScreenProps {
   words: Word[];
   onFinish: (correctCount: number, incorrectCount: number) => void;
+  initialIndex: number;
+  initialCorrect: number;
+  initialIncorrect: number;
+  onProgress: (currentIndex: number, correctCount: number, incorrectCount: number) => void;
+  onQuit: () => void;
   testType: 'word' | 'phrase';
 }
 
-export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish, testType }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [incorrectCount, setIncorrectCount] = useState(0);
+import { X } from 'lucide-react';
+
+export const TestModeScreen: React.FC<TestModeScreenProps> = ({ 
+  words, 
+  onFinish, 
+  testType,
+  initialIndex,
+  initialCorrect,
+  initialIncorrect,
+  onProgress,
+  onQuit
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [correctCount, setCorrectCount] = useState(initialCorrect);
+  const [incorrectCount, setIncorrectCount] = useState(initialIncorrect);
 
   // local state for choices to avoid re-shuffling on re-render
   const [choices, setChoices] = useState<string[]>([]);
@@ -66,6 +82,7 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
   const handleNext = () => {
     if (currentIndex + 1 < words.length) {
       setCurrentIndex(prev => prev + 1);
+      onProgress(currentIndex + 1, correctCount, incorrectCount);
     } else {
       // Pass the count without recalculating the current word
       onFinish(correctCount, incorrectCount);
@@ -97,6 +114,9 @@ export const TestModeScreen: React.FC<TestModeScreenProps> = ({ words, onFinish,
       {/* Progress */}
       <div className="absolute top-4 left-0 right-0 px-6">
         <div className="flex items-center justify-between text-sm font-bold text-slate-400 mb-2">
+          <button onClick={onQuit} className="p-1 -ml-2 text-slate-400 hover:text-slate-600 active:scale-90 transition-all rounded-full hover:bg-slate-200">
+            <X size={20} />
+          </button>
           <span>{currentIndex + 1} / {words.length}</span>
           <span className="uppercase tracking-widest text-primary-500">Test Mode</span>
         </div>

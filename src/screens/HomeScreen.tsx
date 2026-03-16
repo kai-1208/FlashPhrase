@@ -20,6 +20,8 @@ interface HomeScreenProps {
   learnedPhraseCount: number;
   learnedTestWordCount: number;
   learnedTestPhraseCount: number;
+  hasActiveSession: boolean;
+  onResumeSession: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -37,6 +39,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   learnedPhraseCount,
   learnedTestWordCount,
   learnedTestPhraseCount,
+  hasActiveSession,
+  onResumeSession,
 }) => {
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto pb-8">
@@ -47,35 +51,47 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       <div className="px-5 mt-6 space-y-6 flex-1">
-        {/* Range Selection Card */}
+        {hasActiveSession && (
+          <Button 
+            variant="primary" 
+            className="w-full h-16 text-lg font-bold rounded-2xl shadow-primary-500/30 shadow-xl border-2 border-primary-400 bg-primary-600 hover:bg-primary-700 animate-[pulse_3s_ease-in-out_infinite]"
+            onClick={onResumeSession}
+          >
+            続きから始める
+          </Button>
+        )}
+
+        {/* Category Selection Card */}
         <Card className="border-none shadow-md shadow-slate-200/50">
           <CardContent className="p-5">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">学習範囲の設定</h2>
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1">
-                <input
-                  type="number"
-                  value={rangeStart}
-                  onChange={(e) => setRangeStart(Number(e.target.value))}
-                  className="w-full h-14 bg-slate-100 rounded-xl px-4 text-xl font-semibold text-center text-slate-700 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
-                  min={1}
-                  max={maxWords}
-                />
-                <span className="absolute left-3 top-4 text-sm text-slate-400 font-medium">No.</span>
-              </div>
-              <span className="text-slate-400 font-bold">〜</span>
-              <div className="relative flex-1">
-                <input
-                  type="number"
-                  value={rangeEnd}
-                  onChange={(e) => setRangeEnd(Number(e.target.value))}
-                  className="w-full h-14 bg-slate-100 rounded-xl px-4 text-xl font-semibold text-center text-slate-700 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
-                  min={1}
-                  max={maxWords}
-                />
-              </div>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">学習カテゴリ</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: '1〜400', start: 1, end: 400 },
+                { label: '401〜700', start: 401, end: 700 },
+                { label: '701〜900', start: 701, end: 900 },
+                { label: '901〜1000', start: 901, end: 1000 },
+              ].map((cat) => {
+                const isSelected = rangeStart === cat.start && rangeEnd === cat.end;
+                return (
+                  <Button
+                    key={cat.label}
+                    variant={isSelected ? 'primary' : 'outline'}
+                    className={cn(
+                      'h-12 rounded-xl text-sm font-bold transition-all',
+                      isSelected ? 'shadow-primary-500/20 shadow-md ring-2 ring-primary-500/50' : 'text-slate-500 hover:bg-slate-50'
+                    )}
+                    onClick={() => {
+                      setRangeStart(cat.start);
+                      setRangeEnd(cat.end);
+                    }}
+                  >
+                    {cat.label}
+                  </Button>
+                );
+              })}
             </div>
-            <p className="text-xs text-center text-slate-400 mt-3">全 {maxWords} 単語収録</p>
+            <p className="text-xs text-center text-slate-400 mt-4">全 {maxWords} 単語収録</p>
           </CardContent>
         </Card>
 
