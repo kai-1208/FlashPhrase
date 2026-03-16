@@ -7,11 +7,15 @@ const STORAGE_KEY_WORD_LEARNED = 'flashphrase_word_learned';
 const STORAGE_KEY_PHRASE_LEARNED = 'flashphrase_phrase_learned';
 const STORAGE_KEY_TEST_WORD_LEARNED = 'flashphrase_test_word_learned';
 const STORAGE_KEY_TEST_PHRASE_LEARNED = 'flashphrase_test_phrase_learned';
-const STORAGE_KEY_ACTIVE_SESSION = 'flashphrase_active_session';
+const STORAGE_PREFIX_ACTIVE_SESSION = 'flashphrase_active_session_';
 
-import type { AppState } from '../types';
+import type { AppState, LearningMode } from '../types';
 
 export type StorageType = 'word' | 'phrase' | 'test_word' | 'test_phrase';
+
+const getSessionKey = (mode: LearningMode, rangeStart: number, rangeEnd: number) => {
+  return `${STORAGE_PREFIX_ACTIVE_SESSION}${mode}_${rangeStart}_${rangeEnd}`;
+};
 
 const getReviewKey = (type: StorageType) => {
   switch (type) {
@@ -99,17 +103,19 @@ export const removeLearnedId = (type: StorageType, id: number): void => {
   }
 };
 
-export const saveActiveSession = (session: AppState): void => {
+export const saveActiveSession = (mode: LearningMode, rangeStart: number, rangeEnd: number, session: AppState): void => {
   try {
-    localStorage.setItem(STORAGE_KEY_ACTIVE_SESSION, JSON.stringify(session));
+    const key = getSessionKey(mode, rangeStart, rangeEnd);
+    localStorage.setItem(key, JSON.stringify(session));
   } catch (error) {
     console.error('Failed to save to localStorage', error);
   }
 };
 
-export const getActiveSession = (): AppState | null => {
+export const getActiveSession = (mode: LearningMode, rangeStart: number, rangeEnd: number): AppState | null => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY_ACTIVE_SESSION);
+    const key = getSessionKey(mode, rangeStart, rangeEnd);
+    const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   } catch (error) {
     console.error('Failed to parse from localStorage', error);
@@ -117,6 +123,7 @@ export const getActiveSession = (): AppState | null => {
   }
 };
 
-export const clearActiveSession = (): void => {
-  localStorage.removeItem(STORAGE_KEY_ACTIVE_SESSION);
+export const clearActiveSession = (mode: LearningMode, rangeStart: number, rangeEnd: number): void => {
+  const key = getSessionKey(mode, rangeStart, rangeEnd);
+  localStorage.removeItem(key);
 };

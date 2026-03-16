@@ -20,8 +20,6 @@ interface HomeScreenProps {
   learnedPhraseCount: number;
   learnedTestWordCount: number;
   learnedTestPhraseCount: number;
-  hasActiveSession: boolean;
-  onResumeSession: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -39,8 +37,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   learnedPhraseCount,
   learnedTestWordCount,
   learnedTestPhraseCount,
-  hasActiveSession,
-  onResumeSession,
 }) => {
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto pb-8">
@@ -51,16 +47,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       <div className="px-5 mt-6 space-y-6 flex-1">
-        {hasActiveSession && (
-          <Button 
-            variant="primary" 
-            className="w-full h-16 text-lg font-bold rounded-2xl shadow-primary-500/30 shadow-xl border-2 border-primary-400 bg-primary-600 hover:bg-primary-700 animate-[pulse_3s_ease-in-out_infinite]"
-            onClick={onResumeSession}
-          >
-            続きから始める
-          </Button>
-        )}
-
         {/* Category Selection Card */}
         <Card className="border-none shadow-md shadow-slate-200/50">
           <CardContent className="p-5">

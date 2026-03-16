@@ -11,7 +11,6 @@ import { getReviewList, getLearnedList, getActiveSession, saveActiveSession, cle
 const App: React.FC = () => {
   const allWords = wordsData as Word[];
   const maxWords = allWords.length;
-  const [hasActiveSession, setHasActiveSession] = useState(false);
 
   const [state, setState] = useState<AppState>({
     mode: 'none',
@@ -50,18 +49,22 @@ const App: React.FC = () => {
   useEffect(() => {
     if (state.mode === 'none') {
       updateReviewCounts();
-      setHasActiveSession(!!getActiveSession());
     }
   }, [state.mode, state.rangeStart, state.rangeEnd]);
 
-  const handleResumeSession = () => {
-    const session = getActiveSession();
-    if (session) {
-      setState(session);
-    }
-  };
-
   const handleStartMode = (mode: LearningMode) => {
+    // Check if there is an active session for this specific category and mode
+    const activeSession = getActiveSession(mode, state.rangeStart, state.rangeEnd);
+    if (activeSession) {
+      if (window.confirm('過去の中断データがあります。続きから再開しますか？\n「キャンセル」を押すと最初から開始します。')) {
+        setState(activeSession);
+        return;
+      } else {
+        // User wants to start from scratch, clear the old session
+        clearActiveSession(mode, state.rangeStart, state.rangeEnd);
+      }
+    }
+
     // Get words in range
     const wordsInRange = allWords.filter(
       (w) => w.id >= state.rangeStart && w.id <= state.rangeEnd
@@ -119,13 +122,13 @@ const App: React.FC = () => {
       sessionWords,
     };
     setState(newState);
-    saveActiveSession(newState);
+    saveActiveSession(mode, state.rangeStart, state.rangeEnd, newState);
   };
 
   const handleProgress = (currentIndex: number, correctCount: number, incorrectCount: number) => {
     const updatedState = { ...state, currentIndex, correctCount, incorrectCount };
     setState(updatedState);
-    saveActiveSession(updatedState);
+    saveActiveSession(state.mode, state.rangeStart, state.rangeEnd, updatedState);
   };
 
   const handleQuit = () => {
@@ -136,7 +139,7 @@ const App: React.FC = () => {
   };
 
   const handleFinish = (correctCount: number, incorrectCount: number) => {
-    clearActiveSession();
+    clearActiveSession(state.mode, state.rangeStart, state.rangeEnd);
     setState((prev) => ({
       ...prev,
       mode: 'result' as any,
@@ -170,8 +173,6 @@ const App: React.FC = () => {
           learnedPhraseCount={learnedPhraseCount}
           learnedTestWordCount={learnedTestWordCount}
           learnedTestPhraseCount={learnedTestPhraseCount}
-          hasActiveSession={hasActiveSession}
-          onResumeSession={handleResumeSession}
         />
       )}
 
