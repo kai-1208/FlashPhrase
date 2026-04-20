@@ -1,73 +1,38 @@
-# React + TypeScript + Vite
+# FlashPhrase (フラッシュフレーズ)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 作成のきっかけ・背景
 
-Currently, two official plugins are available:
+もととなる単語帳は、英単語のレベルや選定が非常に素晴らしいものでした。しかし、学習方法として「**日本語から英語**を思い出す」というアプローチを採っており、実際の英語学習や読解においては少し非効率的だと感じていました。
+そこで、「**英語から日本語**の意味を素早く引き出す」というより実用的で効率的な学習を行えるようにしたいと考えました。また、まとまった時間が取れなくても、通勤中などのスキマ時間にスマートフォンで簡単に使えるアプリが欲しかったため、このアプリケーションの開発に至りました。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## アプリの概要
 
-## React Compiler
+FlashPhraseは、スマートフォンでの片手操作に最適化された英単語・フレーズ学習向けのWebアプリケーション（PWA対応）です。
+面倒な会員登録やサーバーとの通信待ち時間が一切なく、オフラインでもネイティブアプリのような直感的な操作感で、短い時間で効率的に反復学習ができる仕組みを提供しています。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 使い方
 
-## Expanding the ESLint configuration
+1. **学習範囲の設定**
+   - ホーム画面で「1〜400」「401〜700」「701〜900」「901〜1000」のカテゴリボタンをタップするか、または任意の単語番号（No.）を手動で入力して出題範囲を柔軟に設定できます。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **モードの選択**
+   - **単語モード**: 英単語を見て日本語訳を答えるフラッシュカード形式の学習です。
+   - **フレーズモード**: 英語のフレーズ（例文）を見て日本語訳を答えます。文脈の中で単語の使い方を学べます。
+   - **テストモード (4択)**: 英語を見て4つの選択肢から正しい日本語訳を選ぶクイズ形式です（出題順は覚えやすいように番号順に提示されます）。
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. **習熟度の管理**
+   - 各モードで学習を進めると、間違えた（分からなかった）問題が「復習のみ」リストに、正解した（分かっていた）問題が「学習済み」リストに自動的に振り分けられます。
+   - ホーム画面から「復習のみ」の単語だけをピックアップして効率的に弱点克服をすることが可能です。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+4. **学習の再開機能（レジューム）**
+   - 学習を途中で中断（ヘッダーの「X」ボタンを押して終了など）しても、次回そのカテゴリとモードを開いた際に、中断したところから再開するか最初からやり直すかを選択できます。
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 技術スタック
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Frontend Framework**: React
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Data Persistence**: `localStorage`（ブラウザのローカルに進行状況を保存するため、サーバー通信は不要です）
+- **PWA Support**: `vite-plugin-pwa`（スマホのホーム画面に追加してアプリのように利用可能）
