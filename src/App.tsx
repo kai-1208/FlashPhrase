@@ -74,10 +74,6 @@ const App: React.FC = () => {
 
     if (mode === 'word_all' || mode === 'phrase_all' || mode === 'test_word' || mode === 'test_phrase') {
       sessionWords = [...wordsInRange];
-      // Randomize for test mode
-      if (mode === 'test_word' || mode === 'test_phrase') {
-        sessionWords.sort(() => Math.random() - 0.5);
-      }
     } else if (mode === 'word_review') {
       const reviewIds = getReviewList('word');
       sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
@@ -87,11 +83,9 @@ const App: React.FC = () => {
     } else if (mode === 'test_word_review') {
       const reviewIds = getReviewList('test_word');
       sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
-      sessionWords.sort(() => Math.random() - 0.5);
     } else if (mode === 'test_phrase_review') {
       const reviewIds = getReviewList('test_phrase');
       sessionWords = wordsInRange.filter((w) => reviewIds.includes(w.id));
-      sessionWords.sort(() => Math.random() - 0.5);
     } else if (mode === 'word_learned') {
       const learnedIds = getLearnedList('word');
       sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
@@ -101,11 +95,9 @@ const App: React.FC = () => {
     } else if (mode === 'test_word_learned') {
       const learnedIds = getLearnedList('test_word');
       sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
-      sessionWords.sort(() => Math.random() - 0.5);
     } else if (mode === 'test_phrase_learned') {
       const learnedIds = getLearnedList('test_phrase');
       sessionWords = wordsInRange.filter((w) => learnedIds.includes(w.id));
-      sessionWords.sort(() => Math.random() - 0.5);
     }
 
     if (sessionWords.length === 0) {

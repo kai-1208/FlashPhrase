@@ -47,10 +47,38 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       <div className="px-5 mt-6 space-y-6 flex-1">
-        {/* Category Selection Card */}
+        {/* Range Selection Card */}
         <Card className="border-none shadow-md shadow-slate-200/50">
           <CardContent className="p-5">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">学習カテゴリ</h2>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">学習範囲の設定</h2>
+            
+            {/* Manual Range Input */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  value={rangeStart}
+                  onChange={(e) => setRangeStart(Number(e.target.value))}
+                  className="w-full h-14 bg-slate-100 rounded-xl px-4 text-xl font-semibold text-center text-slate-700 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                  min={1}
+                  max={maxWords}
+                />
+                <span className="absolute left-3 top-4 text-sm text-slate-400 font-medium">No.</span>
+              </div>
+              <span className="text-slate-400 font-bold">〜</span>
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  value={rangeEnd}
+                  onChange={(e) => setRangeEnd(Number(e.target.value))}
+                  className="w-full h-14 bg-slate-100 rounded-xl px-4 text-xl font-semibold text-center text-slate-700 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                  min={1}
+                  max={maxWords}
+                />
+              </div>
+            </div>
+
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">カテゴリから選ぶ</h3>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: '1〜400', start: 1, end: 400 },
