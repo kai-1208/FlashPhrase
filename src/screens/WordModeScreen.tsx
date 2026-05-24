@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import type { Word } from '../types';
 import { addReviewId, addLearnedId } from '../lib/storage';
+import { X, Volume2 } from 'lucide-react';
 
 interface WordModeScreenProps {
   words: Word[];
@@ -14,8 +15,6 @@ interface WordModeScreenProps {
   onQuit: () => void;
   reviewType: 'word' | 'phrase';
 }
-
-import { X } from 'lucide-react';
 
 export const WordModeScreen: React.FC<WordModeScreenProps> = ({ 
   words, 
@@ -33,6 +32,29 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({
   const [incorrectCount, setIncorrectCount] = useState(initialIncorrect);
 
   const currentWord = words[currentIndex];
+
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  useEffect(() => {
+    if (reviewType === 'word' && currentWord) {
+      speak(currentWord.word_en);
+    }
+  }, [currentIndex, reviewType, currentWord]);
+
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleNext = (knew: boolean) => {
     const newCorrect = correctCount + (knew ? 1 : 0);
@@ -81,10 +103,24 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({
           onClick={() => !isRevealed && setIsRevealed(true)}
         >
           {/* Question Side */}
-          <CardContent className="flex-[0.4] flex items-end justify-center pb-6 border-b border-slate-100 bg-white">
+          <CardContent className="flex-[0.4] flex flex-col justify-end items-center pb-6 border-b border-slate-100 bg-white gap-4">
             <h2 className="text-4xl text-center font-extrabold tracking-tight text-slate-800 break-words leading-tight">
               {reviewType === 'word' ? currentWord.word_en : currentWord.sentence_en}
             </h2>
+            {reviewType === 'word' && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation(); // Avoid triggering card tap to reveal answer
+                  speak(currentWord.word_en);
+                }}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-90 transition-all shadow-sm border border-primary-100"
+                title="音声を再生"
+                aria-label="Speak word"
+              >
+                <Volume2 className="w-6 h-6" />
+              </button>
+            )}
           </CardContent>
 
           {/* Answer Side */}
