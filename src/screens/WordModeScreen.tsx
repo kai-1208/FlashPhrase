@@ -43,8 +43,12 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({
   };
 
   useEffect(() => {
-    if (reviewType === 'word' && currentWord) {
-      speak(currentWord.word_en);
+    if (currentWord) {
+      if (reviewType === 'word') {
+        speak(currentWord.word_en);
+      } else if (reviewType === 'phrase') {
+        speak(currentWord.sentence_en);
+      }
     }
   }, [currentIndex, reviewType, currentWord]);
 
@@ -107,20 +111,22 @@ export const WordModeScreen: React.FC<WordModeScreenProps> = ({
             <h2 className="text-4xl text-center font-extrabold tracking-tight text-slate-800 break-words leading-tight">
               {reviewType === 'word' ? currentWord.word_en : currentWord.sentence_en}
             </h2>
-            {reviewType === 'word' && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation(); // Avoid triggering card tap to reveal answer
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation(); // Avoid triggering card tap to reveal answer
+                if (reviewType === 'word') {
                   speak(currentWord.word_en);
-                }}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-90 transition-all shadow-sm border border-primary-100"
-                title="音声を再生"
-                aria-label="Speak word"
-              >
-                <Volume2 className="w-6 h-6" />
-              </button>
-            )}
+                } else {
+                  speak(currentWord.sentence_en);
+                }
+              }}
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-90 transition-all shadow-sm border border-primary-100"
+              title="音声を再生"
+              aria-label="Speak"
+            >
+              <Volume2 className="w-6 h-6" />
+            </button>
           </CardContent>
 
           {/* Answer Side */}
